@@ -1,43 +1,54 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-
-const doctorShema = new mongoose.Schema({
-    name: {
+const doctorSchema = new mongoose.Schema({
+    firstName: {
         type: String,
-        required: true,
+        trim: true,
+        required: true
     },
-    specialty: {
+    lastName: {
         type: String,
-        required: true,
+        trim: true,
+        required: true
+    },
+    password: {
+        type: String,
+        trim: true,
+        set: function(password) {
+            let saltKey = bcrypt.genSaltSync(10);
+            return bcrypt.hashSync(password, saltKey);
+        },
+        required: true
     },
     email: {
         type: String,
-        required: true,
-        unique: true,
-    },
-    phone: {
-        type: String,
-        required: true,
-    },
-    password:{
-        type: String,
         trim: true,
-        set: function(password){
-            let saltKey = bcrypt.genSaltSync(10);
-            return bcrypt.hashSync(password,saltKey);
-        }
+    },
+    contact: {
+        type: String, 
+        trim: true,
+    },
+    DOB: {
+        type: Date, 
+        required: true
+    },
+    gender: {
+        type: String,
+        enum: ['Male', 'Female', 'Other'],
+        required: true
     },
     address: {
         type: String,
-        required: true,
+        trim: true,
+        required: true
     },
-    workingHours: {
+    branch: {
         type: String,
-        required: true,
-    },
-},{versionKey: false});
-
-const Doctor = mongoose.model("doctor",doctorShema);
+        enum: ['Cardiology', 'Dermatology', 'Endocrinology', 'Gastroenterology', 'Neurology', 'Orthopedics', 'Pediatrics'],
+        required: true
+    }
+}, { versionKey: false });
+const Doctor = mongoose.model("doctor",doctorSchema);
 
 Doctor.checkPassword = (password, encryptedPassword)=>{
   return bcrypt.compareSync(password,encryptedPassword);
